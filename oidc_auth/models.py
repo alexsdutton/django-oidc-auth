@@ -150,7 +150,7 @@ class OpenIDProvider(models.Model):
 
         id_token = JWS().verify_compact(token, self.signing_keys)
         log.debug('Token verified, %s' % id_token)
-        return json.loads(id_token)
+        return id_token
 
     @staticmethod
     def _get_issuer(token):
