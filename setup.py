@@ -13,8 +13,7 @@ setup(
     include_package_data=True,
     install_requires=[
         'Django>=1.5',
-        'South==1.0.2',
-        'pyjwkest==0.6.2',
+        'pyjwkest==1.3.2',
         'requests',
     ],
     zip_safe=True
