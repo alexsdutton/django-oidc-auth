@@ -228,16 +228,16 @@ class OpenIDUser(models.Model):
 
         # Find an existing User locally or create a new one
         try:
-            user = UserModel.objects.get(username__iexact=id_token['sub'])
+            user = UserModel.objects.get(**{UserModel.USERNAME_FIELD: id_token['sub']})
             log.debug('Found user with username %s locally' % id_token['sub'])
         except UserModel.MultipleObjectsReturned:
-            user = UserModel.objects.filter(username__iexact=id_token['sub'])[0]
+            user = UserModel.objects.filter(**{UserModel.USERNAME_FIELD: id_token['sub']})[0]
             log.warn('Multiple users found with username %s! First match will be selected' % id_token['sub'])
         except UserModel.DoesNotExist:
             log.debug('User with username %s not found locally, '
                       'so it will be created' % id_token['sub'])
 
-            user = UserModel()
+            user = UserModel(**{UserModel.USERNAME_FIELD: id_token['sub']})
 
         # Always update user's local data
         claims = cls._get_userinfo(provider, id_token['sub'],
