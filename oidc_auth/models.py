@@ -1,7 +1,10 @@
 import string
 import random
 import json
-from urlparse import urljoin
+try:
+    from urllib.parse import urljoin  # Py3
+except ImportError:
+    from urlparse import urljoin      # Py2.7
 import requests
 from django.db import models, IntegrityError
 from django.conf import settings

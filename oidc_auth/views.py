@@ -1,4 +1,7 @@
-from urllib import urlencode
+try:
+    from urllib.parse import urlencode  # Py3
+except ImportError:
+    from urllib import urlencode        # Py2.7
 from django.conf import settings
 from django.http import HttpResponseBadRequest
 from django.contrib.auth import REDIRECT_FIELD_NAME, authenticate, login as django_login
@@ -83,7 +86,7 @@ def login_complete(request, login_complete_view='oidc-complete',
 
     response = requests.post(provider.token_endpoint,
                              auth=provider.client_credentials,
-                             params=params, verify=oidc_settings.VERIFY_SSL)
+                             data=params, verify=oidc_settings.VERIFY_SSL)
 
     if response.status_code != 200:
         raise errors.RequestError(provider.token_endpoint, response.status_code)

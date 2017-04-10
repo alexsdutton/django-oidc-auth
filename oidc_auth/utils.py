@@ -16,7 +16,7 @@ def scopes():
 def b64decode(token):
     token += ('=' * (len(token) % 4))
     decoded = python_b64decode(token)
-    return json.loads(decoded)
+    return json.loads(decoded.decode('utf-8'))
 
 
 def get_user_model():
