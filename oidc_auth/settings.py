@@ -37,7 +37,7 @@ class OIDCSettings(object):
         else:
             val = self.defaults[attr]
 
-        if attr in self.settings_to_import:
+        if attr in self.settings_to_import and not callable(val):
             val = import_string(val)
 
         self.__dict__[attr] = val
