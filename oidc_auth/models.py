@@ -243,7 +243,7 @@ class OpenIDUser(models.Model):
         claims = cls._get_userinfo(provider, id_token['sub'],
                                    access_token, refresh_token)
 
-        process_userinfo = oidc_settings.get('PROCESS_USERINFO', cls.process_userinfo)
+        process_userinfo = oidc_settings.PROCESS_USERINFO or cls.process_userinfo
         process_userinfo(user, claims)
 
         # Avoid duplicate user key
