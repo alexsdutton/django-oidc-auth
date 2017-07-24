@@ -243,21 +243,14 @@ class OpenIDUser(models.Model):
         claims = cls._get_userinfo(provider, id_token['sub'],
                                    access_token, refresh_token)
 
-        user.username   = claims['preferred_username']
-        user.email      = claims['email']
-        user.first_name = claims['given_name']
-        user.last_name  = claims['family_name']
-        user.is_superuser = claims.get('is_superuser', False)
-        user.is_staff = claims.get('is_staff', False)
-
-        user.set_unusable_password()
-        user.save()
+        process_userinfo = oidc_settings.get('PROCESS_USERINFO', cls.process_userinfo)
+        process_userinfo(user, claims)
 
         # Avoid duplicate user key
         try:
             oidc_acc = cls.objects.get(user=user)
 
-            oidc_acc.sub= id_token['sub']
+            oidc_acc.sub = id_token['sub']
             oidc_acc.access_token = access_token
             oidc_acc.refresh_token = refresh_token
             oidc_acc.save()
@@ -268,7 +261,19 @@ class OpenIDUser(models.Model):
             log.debug("OpenIDUser for sub %s not found, so it'll be created" % id_token['sub'])
 
         return cls.objects.create(sub=id_token['sub'], issuer=provider,
-                user=user, access_token=access_token, refresh_token=refresh_token)
+                                  user=user, access_token=access_token, refresh_token=refresh_token)
+
+    @classmethod
+    def process_userinfo(cls, user, claims):
+        user.username   = claims['preferred_username']
+        user.email      = claims['email']
+        user.first_name = claims['given_name']
+        user.last_name  = claims['family_name']
+        user.is_superuser = claims.get('is_superuser', False)
+        user.is_staff = claims.get('is_staff', False)
+
+        user.set_unusable_password()
+        user.save()
 
     @classmethod
     def _get_userinfo(cls, provider, sub, access_token, refresh_token):

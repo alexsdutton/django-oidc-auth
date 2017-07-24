@@ -1,6 +1,6 @@
 from contextlib import contextmanager
 from django.conf import settings
-
+from django.utils.module_loading import import_string
 
 DEFAULTS = {
     'DISABLE_OIDC': False,
@@ -9,7 +9,8 @@ DEFAULTS = {
     'CLIENT_ID': None,
     'CLIENT_SECRET': None,
     'NONCE_LENGTH': 8,
-    'VERIFY_SSL': True
+    'VERIFY_SSL': True,
+    'PROCESS_USERINFO': None,
 }
 
 USER_SETTINGS = getattr(settings, 'OIDC_AUTH', {})
@@ -17,6 +18,8 @@ USER_SETTINGS = getattr(settings, 'OIDC_AUTH', {})
 
 class OIDCSettings(object):
     """Shamelessly copied from django-oauth-toolkit"""
+
+    settings_to_import = frozenset(['PROCESS_USERINFO'])
 
     def __init__(self, user_settings, defaults):
         self.user_settings = user_settings
@@ -33,6 +36,11 @@ class OIDCSettings(object):
             val = self.user_settings[attr]
         else:
             val = self.defaults[attr]
+
+        if attr in self.settings_to_import:
+            val = import_string(val)
+
+        self.__dict__[attr] = val
 
         return val
 
