@@ -292,8 +292,8 @@ class OpenIDUser(models.Model):
         if claims['sub'] != sub:
             raise errors.InvalidUserInfo()
 
-        name = '%s %s' % (claims['given_name'], claims['family_name'])
+        name = '%s %s' % (claims.get('given_name'), claims.get('family_name'))
         log.debug('t userinfo of sub: %s -> name: %s, preferred_username: %s, email: %s' % (sub,
-            name, claims['preferred_username'], claims['email']))
+            name, claims.get('preferred_username'), claims.get('email')))
 
         return claims
