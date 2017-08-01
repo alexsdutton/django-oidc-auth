@@ -1,3 +1,5 @@
+from django.core.exceptions import PermissionDenied
+
 try:
     from urllib.parse import urlencode  # Py3
 except ImportError:
@@ -95,6 +97,10 @@ def login_complete(request, login_complete_view='oidc-complete',
     credentials = response.json()
     credentials['provider'] = provider
     user = authenticate(credentials=credentials)
+
+    if not user:
+        raise PermissionDenied
+
     django_login(request, user)
 
     return redirect(nonce.redirect_url)
